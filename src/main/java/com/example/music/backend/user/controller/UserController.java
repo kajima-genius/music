@@ -43,7 +43,6 @@ public class UserController {
             return new ModelAndView("emailError", "user", userDto);
         }
         return new ModelAndView("successRegister", "user", userDto);
-
     }
 
     @GetMapping(path = "/user/registration")

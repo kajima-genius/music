@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 public class UserServiceV1 implements UserService {
 
     private final UserRepository userRepository;
-    private final UserDtoConverter converter;
     private final VerificationTokenRepository tokenRepository;
+    private final UserDtoConverter converter;
 
-    public UserServiceV1(UserRepository userRepository, UserDtoConverter converter, VerificationTokenRepository tokenRepository) {
+    public UserServiceV1(UserRepository userRepository, VerificationTokenRepository tokenRepository, UserDtoConverter converter) {
         this.userRepository = userRepository;
-        this.converter = converter;
         this.tokenRepository = tokenRepository;
+        this.converter = converter;
     }
 
     private boolean emailExist(String email) {
@@ -67,8 +67,4 @@ public class UserServiceV1 implements UserService {
         return userRepository.save(newUser);
     }
 
-    @Override
-    public UserDto getDto() {
-        return null;
-    }
 }

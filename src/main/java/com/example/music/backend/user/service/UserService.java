@@ -18,6 +18,5 @@ public interface UserService {
 
     User create(UserDto dto);
 
-    UserDto getDto();
 
 }

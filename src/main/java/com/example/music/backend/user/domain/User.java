@@ -34,7 +34,6 @@ public class User {
     }
 
     public User(String userName, Gender gender, String email, String password, Role role, String strDate) {
-        super();
         this.enabled = false;
         this.userName = userName;
         this.gender = gender;

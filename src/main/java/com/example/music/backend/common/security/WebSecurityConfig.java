@@ -1,5 +1,8 @@
 package com.example.music.backend.common.security;
 
+import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -8,13 +11,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String COOKIES = "JSESSIONID";
-    private static final int MAXIMUM_SESSIONS_COUNT = 1;
+
+    @Value("${maximum.session.count}")
+    private int MAXIMUM_SESSIONS_COUNT;
 
 
     private final UserDetailsService userDetailsService;
@@ -27,6 +33,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.encoder = encoder;
     }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
+
+    @Bean
+    RestAuthenticationEntryPoint authenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
+
     @Override
     protected void configure(final AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(encoder);
@@ -34,7 +50,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+
+                .and()
                 .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint())
 
                 .and()
                 .cors()
@@ -43,14 +63,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .authorizeRequests()
 
-                .and()
-                .authorizeRequests()
-
                 .antMatchers("/").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-
-                .and()
-                .httpBasic()
 
                 .and()
                 .logout()
