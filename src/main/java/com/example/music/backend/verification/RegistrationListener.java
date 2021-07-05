@@ -2,6 +2,7 @@ package com.example.music.backend.verification;
 
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.service.UserService;
+import com.example.music.backend.verification.service.VerificationTokenService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,19 +15,16 @@ import java.util.UUID;
 public class RegistrationListener implements
         ApplicationListener<OnRegistrationCompleteEvent> {
 
-
     private UserService userService;
-
-
     private MessageSource messages;
-
-
     private JavaMailSender mailSender;
+    private VerificationTokenService tokenService;
 
-    public RegistrationListener(UserService userService, MessageSource messages, JavaMailSender mailSender) {
+    public RegistrationListener(UserService userService, MessageSource messages, JavaMailSender mailSender, VerificationTokenService tokenService) {
         this.userService = userService;
         this.messages = messages;
         this.mailSender = mailSender;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class RegistrationListener implements
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         User user = event.getUser();
         String token = UUID.randomUUID().toString();
-        userService.createVerificationToken(user, token);
+        tokenService.createVerificationToken(user, token);
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";

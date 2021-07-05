@@ -1,10 +1,7 @@
 package com.example.music.backend.user.domain;
 
 import javax.persistence.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 @Entity
 @Table(name = "users")
@@ -40,7 +37,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
-        this.dateOfBirth = parseDate(strDate);
+        this.dateOfBirth = UserUtil.parseDate(strDate);
     }
 
     public Role getRole() {
@@ -105,17 +102,5 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    private Date parseDate(String strDate) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY");
-        try {
-            Date date = formatter.parse(strDate);
-            return date;
-        }
-        catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

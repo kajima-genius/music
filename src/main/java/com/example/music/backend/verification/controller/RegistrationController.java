@@ -1,7 +1,9 @@
-package com.example.music.backend.verification;
+package com.example.music.backend.verification.controller;
 
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.service.UserService;
+import com.example.music.backend.verification.domain.VerificationToken;
+import com.example.music.backend.verification.service.VerificationTokenService;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +17,14 @@ import java.util.Locale;
 @RestController
 public class RegistrationController {
 
-    private UserService userService;
+    private final UserService userService;
+    private final MessageSource messages;
+    private final VerificationTokenService tokenService;
 
-    private MessageSource messages;
-
-    public RegistrationController(UserService userService, MessageSource messages) {
+    public RegistrationController(UserService userService, MessageSource messages, VerificationTokenService tokenService) {
         this.userService = userService;
         this.messages = messages;
+        this.tokenService = tokenService;
     }
 
     @GetMapping("/registrationConfirm.html")
@@ -29,7 +32,7 @@ public class RegistrationController {
             (WebRequest request, Model model, @RequestParam("token") String token) {
         Locale locale = request.getLocale();
 
-        VerificationToken verificationToken = userService.getVerificationToken(token);
+        VerificationToken verificationToken = tokenService.getVerificationToken(token);
 
         if(verificationToken == null) {
             String message = messages.getMessage("auth.message.expired", null, locale);

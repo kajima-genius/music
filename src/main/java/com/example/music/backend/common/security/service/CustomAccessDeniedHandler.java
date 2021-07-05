@@ -1,4 +1,4 @@
-package com.example.music.backend.common.security.handler;
+package com.example.music.backend.common.security.service;
 
 import org.json.JSONObject;
 import org.springframework.security.access.AccessDeniedException;

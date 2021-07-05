@@ -1,8 +1,8 @@
 package com.example.music.backend.user.service;
 
 import com.example.music.backend.common.exception.NotFoundException;
-import com.example.music.backend.verification.VerificationToken;
-import com.example.music.backend.verification.VerificationTokenRepository;
+import com.example.music.backend.verification.domain.VerificationToken;
+import com.example.music.backend.verification.repository.VerificationTokenRepository;
 import com.example.music.backend.user.converter.UserDtoConverter;
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.dto.UserDto;
@@ -16,17 +16,15 @@ public class UserServiceV1 implements UserService {
 
     private final UserRepository userRepository;
     private final VerificationTokenRepository tokenRepository;
-    private final UserDtoConverter converter;
 
-    public UserServiceV1(UserRepository userRepository, VerificationTokenRepository tokenRepository, UserDtoConverter converter) {
+    public UserServiceV1(UserRepository userRepository, VerificationTokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
-        this.converter = converter;
     }
 
     private boolean emailExist(String email) {
-        return userRepository.findByEmail(email) != null;
-    } //todo раньше было ==
+        return userRepository.findByEmail(email).stream().count() >= 1;
+    }
 
     @Override
     public User getUser(Long id) {
@@ -37,17 +35,6 @@ public class UserServiceV1 implements UserService {
     @Override
     public void saveRegisteredUser(User user) {
         userRepository.save(user);
-    }
-
-    @Override
-    public void createVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
-    }
-
-    @Override
-    public VerificationToken getVerificationToken(String VerificationToken) {
-        return tokenRepository.findByToken(VerificationToken);
     }
 
     @Override
@@ -63,7 +50,7 @@ public class UserServiceV1 implements UserService {
                     + dto.getEmail());
         }
 
-        User newUser = converter.toEntity(dto);
+        User newUser = UserDtoConverter.toEntity(dto);
         return userRepository.save(newUser);
     }
 

@@ -1,4 +1,4 @@
-package com.example.music.backend.verification;
+package com.example.music.backend.verification.domain;
 
 import com.example.music.backend.user.domain.User;
 

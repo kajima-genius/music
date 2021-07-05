@@ -1,10 +1,11 @@
 package com.example.music.backend.common.security;
 
-import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
+import com.example.music.backend.common.security.service.CustomAccessDeniedHandler;
+import com.example.music.backend.user.domain.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
+@PropertySource("classpath:constants.properties")
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -21,7 +23,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${maximum.session.count}")
     private int MAXIMUM_SESSIONS_COUNT;
-
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
@@ -65,6 +66,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers("/").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
+
+                .antMatchers("/admin/**")
+                .hasAnyAuthority(Role.ADMIN.name())
+
+                .antMatchers("/login*")
+                .permitAll()
 
                 .and()
                 .logout()
