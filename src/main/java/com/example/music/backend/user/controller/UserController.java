@@ -14,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.security.Principal;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller
@@ -31,18 +33,18 @@ public class UserController {
     @PostMapping(produces = APPLICATION_JSON_VALUE, path = "/user/registration")
     public ModelAndView create(@ModelAttribute("UserDto") UserDto userDto,
                                HttpServletRequest request, Errors errors) {
+        ModelAndView mav = new ModelAndView("successRegister", "user", userDto);
         try {
             User saved = service.create(userDto);
             String appUrl = request.getContextPath();
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent(saved, request.getLocale(), appUrl));
         } catch (UserAlreadyExistException uaeEx) {
-            ModelAndView mav = new ModelAndView("registration", "user", userDto);
+            mav.setViewName("registration");
             mav.addObject("message", "An account for that username/email already exists.");
-            return mav;
         } catch (RuntimeException ex) {
-            return new ModelAndView("emailError", "user", userDto);
+            mav.setViewName("emailError");
         }
-        return new ModelAndView("successRegister", "user", userDto);
+        return mav;
     }
 
     @GetMapping(path = "/user/registration")

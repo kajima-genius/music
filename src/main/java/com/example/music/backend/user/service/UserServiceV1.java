@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 public class UserServiceV1 implements UserService {
 
     private final UserRepository userRepository;
-    private final VerificationTokenRepository tokenRepository;
+    private final UserDtoConverter converter;
 
-    public UserServiceV1(UserRepository userRepository, VerificationTokenRepository tokenRepository) {
+    public UserServiceV1(UserRepository userRepository, UserDtoConverter converter) {
         this.userRepository = userRepository;
-        this.tokenRepository = tokenRepository;
+        this.converter = converter;
     }
 
     private boolean emailExist(String email) {
@@ -27,9 +27,9 @@ public class UserServiceV1 implements UserService {
     }
 
     @Override
-    public User getUser(Long id) {
-        return userRepository.findById(id).
-                orElseThrow(() -> new NotFoundException("User not found"));
+    public User getUser(String email) {
+        return userRepository.findByEmail(email).
+                orElseThrow(() -> new NotFoundException("User with email='" + email + "' not found"));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class UserServiceV1 implements UserService {
                     + dto.getEmail());
         }
 
-        User newUser = UserDtoConverter.toEntity(dto);
+        User newUser = converter.toEntity(dto);
         return userRepository.save(newUser);
     }
 

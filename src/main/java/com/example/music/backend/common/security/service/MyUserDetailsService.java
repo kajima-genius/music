@@ -1,4 +1,4 @@
-package com.example.music.backend.common.security.controller;
+package com.example.music.backend.common.security.service;
 
 import com.example.music.backend.common.security.CustomUserPrincipal;
 import com.example.music.backend.user.domain.User;

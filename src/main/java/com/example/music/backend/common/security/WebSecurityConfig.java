@@ -1,6 +1,6 @@
 package com.example.music.backend.common.security;
 
-import com.example.music.backend.common.security.service.CustomAccessDeniedHandler;
+import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
 import com.example.music.backend.user.domain.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
     private static final String COOKIES = "JSESSIONID";
 
     @Value("${maximum.session.count}")
@@ -29,7 +28,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public WebSecurityConfig(final UserDetailsService userDetailsService,
                              final PasswordEncoder encoder) {
-
         this.userDetailsService = userDetailsService;
         this.encoder = encoder;
     }
@@ -48,6 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(encoder);
     }
+
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
@@ -65,13 +64,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 
                 .antMatchers("/").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/h2-console/**", "/login*", "/user/registration").permitAll()
 
                 .antMatchers("/admin/**")
                 .hasAnyAuthority(Role.ADMIN.name())
 
-                .antMatchers("/login*")
-                .permitAll()
+                .and()
+                .formLogin().loginPage("/login")
+                .defaultSuccessUrl("/home").failureUrl("/login?error").permitAll()
+                .and().logout().logoutSuccessUrl("/").permitAll()
 
                 .and()
                 .logout()

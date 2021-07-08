@@ -8,7 +8,7 @@ public interface UserService {
 
     User getCurrentUser();
 
-    User getUser(Long id);
+    User getUser(String email);
 
     void saveRegisteredUser(User user);
 

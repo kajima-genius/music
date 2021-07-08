@@ -12,9 +12,11 @@ public class UserDto {
     private Long id;
     private String email;
     private String password;
-
     private Role role;
     private String dateOfBirch;
+
+    public UserDto() {
+    }
 
     public UserDto(String userName, Gender gender, String email, String password, String dateOfBirch) {
         this.userName = userName;
@@ -30,9 +32,6 @@ public class UserDto {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public UserDto() {
     }
 
     public String getUserName() {

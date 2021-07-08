@@ -1,7 +1,6 @@
 package com.example.music.backend.verification;
 
 import com.example.music.backend.user.domain.User;
-import com.example.music.backend.user.service.UserService;
 import com.example.music.backend.verification.service.VerificationTokenService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
@@ -12,16 +11,13 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class RegistrationListener implements
-        ApplicationListener<OnRegistrationCompleteEvent> {
-
-    private UserService userService;
+public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
     private MessageSource messages;
     private JavaMailSender mailSender;
     private VerificationTokenService tokenService;
 
-    public RegistrationListener(UserService userService, MessageSource messages, JavaMailSender mailSender, VerificationTokenService tokenService) {
-        this.userService = userService;
+    public RegistrationListener(MessageSource messages, JavaMailSender mailSender,
+                                VerificationTokenService tokenService) {
         this.messages = messages;
         this.mailSender = mailSender;
         this.tokenService = tokenService;
@@ -29,10 +25,10 @@ public class RegistrationListener implements
 
     @Override
     public void onApplicationEvent(OnRegistrationCompleteEvent event) {
-        this.confirmRegistration(event);
+        this.sendConformationMail(event);
     }
 
-    private void confirmRegistration(OnRegistrationCompleteEvent event) {
+    private void sendConformationMail(OnRegistrationCompleteEvent event) {
         User user = event.getUser();
         String token = UUID.randomUUID().toString();
         tokenService.createVerificationToken(user, token);
@@ -43,10 +39,16 @@ public class RegistrationListener implements
                 = event.getAppUrl() + "/registrationConfirm.html?token=" + token;
         String message = messages.getMessage("message.regSucc", null, event.getLocale());
 
+        SimpleMailMessage email = createEmail(recipientAddress,subject,message,confirmationUrl);
+        mailSender.send(email);
+    }
+
+    private SimpleMailMessage createEmail(String recipientAddress, String subject,
+                                          String message, String confirmationUrl) {
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
         email.setText(message + "\r\n" + "http://localhost:8080" + confirmationUrl);
-        mailSender.send(email);
+        return  email;
     }
 }
