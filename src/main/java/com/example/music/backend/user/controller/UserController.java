@@ -14,15 +14,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.security.Principal;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller
 public class UserController {
 
     private ApplicationEventPublisher eventPublisher;
-
     private final UserService service;
 
     public UserController(UserService service, ApplicationEventPublisher eventPublisher) {
@@ -58,4 +55,8 @@ public class UserController {
         return "login";
     }
 
+    @GetMapping(path = "/home")
+    public String getHomePage() {
+        return "home";
+    }
 }

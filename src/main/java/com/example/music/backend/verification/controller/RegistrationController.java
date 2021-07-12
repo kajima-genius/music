@@ -37,7 +37,7 @@ public class RegistrationController {
         if(verificationToken == null) {
             String message = messages.getMessage("auth.message.expired", null, locale);
             model.addAttribute("message", message);
-            return "redirect:/badUser.html?lang=" + locale.getLanguage();
+            return "badUser";
         }
 
         User user = verificationToken.getUser();

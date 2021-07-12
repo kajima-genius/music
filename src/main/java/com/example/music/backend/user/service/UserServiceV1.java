@@ -54,4 +54,13 @@ public class UserServiceV1 implements UserService {
         return userRepository.save(newUser);
     }
 
+    @Override
+    public void processOAuthPostLogin(String username) {
+        if (!userRepository.findByEmail(username).isPresent()) {
+            User newUser = new User();
+            newUser.setUserName(username);
+            newUser.setEnabled(true);
+            userRepository.save(newUser);
+        }
+    }
 }

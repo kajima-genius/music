@@ -14,4 +14,6 @@ public interface UserService {
 
     User create(UserDto dto);
 
+    void processOAuthPostLogin(String username);
+
 }
