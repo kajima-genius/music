@@ -1,7 +1,6 @@
 package com.example.music.backend.common.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -10,9 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(
@@ -21,12 +20,10 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException exception)
             throws IOException, ServletException {
 
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getOutputStream()
-                .println(new JSONObject()
-                        .put("message", "Attempted unauthorized use!")
-                        .put("statusCode", 401)
-                        .toString());
+                .println("message: Attempted unauthorized use!" + "\n"
+                        + "statusCode:" + HttpStatus.UNAUTHORIZED);
     }
 }

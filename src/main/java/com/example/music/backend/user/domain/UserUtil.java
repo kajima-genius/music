@@ -1,7 +1,5 @@
 package com.example.music.backend.user.domain;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,8 +11,7 @@ public class UserUtil {
         try {
             Date date = formatter.parse(strDate);
             return date;
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         return null;

@@ -3,14 +3,10 @@ package com.example.music.backend.verification.domain;
 import com.example.music.backend.user.domain.User;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 
 @Entity
 public class VerificationToken {
-
-    private static final int EXPIRATION = 60 * 24;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,16 +25,10 @@ public class VerificationToken {
 
     }
 
-    public VerificationToken( String token, User user) {
+    public VerificationToken(String token, User user) {
         this.token = token;
         this.user = user;
-        expiryDate = calculateExpiryDate();
-    }
-    private Date calculateExpiryDate() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Timestamp(cal.getTime().getTime()));
-        cal.add(Calendar.MINUTE, EXPIRATION);
-        return new Date(cal.getTime().getTime());
+        expiryDate = VerificationTokenUtil.calculateExpiryDate();
     }
 
     public Long getId() {

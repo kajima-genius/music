@@ -81,6 +81,4 @@ public class UserDto {
     public void setDateOfBirch(String dateOfBirch) {
         this.dateOfBirch = dateOfBirch;
     }
-
-
 }

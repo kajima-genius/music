@@ -7,7 +7,7 @@ import java.util.Date;
 @Table(name = "users")
 public class User {
 
-    private String userName;
+    private String username;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -24,15 +24,14 @@ public class User {
 
     private Date dateOfBirth;
 
-    @Column(name = "enabled")
     private boolean enabled;
 
     public User() {
     }
 
-    public User(String userName, Gender gender, String email, String password, Role role, String strDate) {
+    public User(String username, Gender gender, String email, String password, Role role, String strDate) {
         this.enabled = false;
-        this.userName = userName;
+        this.username = username;
         this.gender = gender;
         this.email = email;
         this.password = password;
@@ -48,12 +47,12 @@ public class User {
         this.role = role;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 
     public Gender getGender() {

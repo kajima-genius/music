@@ -1,7 +1,5 @@
 package com.example.music.backend.common.security;
 
-import com.example.music.backend.common.security.googleLogin.CustomOAuth2User;
-import com.example.music.backend.common.security.googleLogin.CustomOAuth2UserService;
 import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
 import com.example.music.backend.user.domain.Role;
 import com.example.music.backend.user.service.UserService;
@@ -13,22 +11,17 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @PropertySource("classpath:constants.properties")
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String COOKIES = "JSESSIONID";
-    private final CustomOAuth2UserService oauthUserService;
     private final UserService userService;
 
     @Value("${maximum.session.count}")
@@ -37,8 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
 
-    public WebSecurityConfig(CustomOAuth2UserService oauthUserService, UserService userService, UserDetailsService userDetailsService, PasswordEncoder encoder) {
-        this.oauthUserService = oauthUserService;
+    public WebSecurityConfig(UserService userService, UserDetailsService userDetailsService, PasswordEncoder encoder) {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.encoder = encoder;
@@ -82,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority(Role.ADMIN.name())
 
                 .and()
-                .formLogin().permitAll()
+                .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/perform-login")
                 .usernameParameter("email")
@@ -92,19 +84,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .oauth2Login()
                 .loginPage("/login")
                 .userInfoEndpoint()
-                .userService(oauthUserService)
                 .and()
-                .successHandler(new AuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest request,
-                                                        HttpServletResponse response,
-                                                        Authentication authentication) throws IOException {
-                        CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
-                        userService.processOAuthPostLogin(oauthUser.getEmail());
-                        System.out.println(oauthUser.getEmail());
-                        response.sendRedirect("/home");
-                    }
-                })
+                .successHandler(new CustomAuthenticationSuccessHandler(userService))
 
                 .and()
                 .logout()

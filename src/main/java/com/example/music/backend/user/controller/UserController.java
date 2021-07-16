@@ -6,6 +6,8 @@ import com.example.music.backend.user.dto.UserDto;
 import com.example.music.backend.user.exception.UserAlreadyExistException;
 import com.example.music.backend.user.service.UserService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -21,10 +23,13 @@ public class UserController {
 
     private ApplicationEventPublisher eventPublisher;
     private final UserService service;
+    private final PasswordEncoder encoder;
 
-    public UserController(UserService service, ApplicationEventPublisher eventPublisher) {
+
+    public UserController(UserService service, ApplicationEventPublisher eventPublisher, PasswordEncoder encoder) {
         this.service = service;
         this.eventPublisher = eventPublisher;
+        this.encoder = encoder;
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, path = "/user/registration")
@@ -32,6 +37,8 @@ public class UserController {
                                HttpServletRequest request, Errors errors) {
         ModelAndView mav = new ModelAndView("successRegister", "user", userDto);
         try {
+            String encodedPassword = encoder.encode(userDto.getPassword());
+            userDto.setPassword(encodedPassword);
             User saved = service.create(userDto);
             String appUrl = request.getContextPath();
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent(saved, request.getLocale(), appUrl));
