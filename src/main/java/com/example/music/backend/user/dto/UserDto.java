@@ -3,8 +3,6 @@ package com.example.music.backend.user.dto;
 import com.example.music.backend.user.domain.Gender;
 import com.example.music.backend.user.domain.Role;
 
-import java.util.Date;
-
 public class UserDto {
 
     private String userName;

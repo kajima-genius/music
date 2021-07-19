@@ -31,6 +31,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 .println("message: User: " + auth.getName()
                         + " attempted to access the protected URL: "
                         + request.getRequestURI() + "\n"
-                        + "statusCode" + HttpStatus.FORBIDDEN);
+                        + "statusCode" + HttpServletResponse.SC_FORBIDDEN);
     }
 }
