@@ -12,6 +12,6 @@ public class VerificationTokenUtil {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Timestamp(cal.getTime().getTime()));
         cal.add(Calendar.MINUTE, EXPIRATION);
-        return new Date(cal.getTime().getTime());
+        return cal.getTime();
     }
 }

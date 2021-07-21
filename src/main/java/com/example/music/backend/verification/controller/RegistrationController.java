@@ -34,7 +34,7 @@ public class RegistrationController {
 
         VerificationToken verificationToken = tokenService.getVerificationToken(token);
 
-        if (verificationToken.equals(null)) {
+        if (verificationToken == null) {
             String message = messages.getMessage("auth.message.expired", null, locale);
             model.addAttribute("message", message);
             return "badUser";
