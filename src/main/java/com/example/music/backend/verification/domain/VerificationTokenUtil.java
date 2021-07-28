@@ -1,15 +1,19 @@
 package com.example.music.backend.verification.domain;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Calendar;
 import java.util.Date;
 
+@UtilityClass
 public class VerificationTokenUtil {
 
-    private static final int EXPIRATION = 60 * 24;
+    private final int EXPIRATION = 60 * 24;
 
-    public static Date calculateExpiryDate() {
+    public Date calculateExpiryDate() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, EXPIRATION);
         return cal.getTime();
     }
 }
+
