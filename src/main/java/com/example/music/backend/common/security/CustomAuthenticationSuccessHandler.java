@@ -12,6 +12,7 @@ import java.io.IOException;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
     UserService userService;
 
     public CustomAuthenticationSuccessHandler(UserService userService) {

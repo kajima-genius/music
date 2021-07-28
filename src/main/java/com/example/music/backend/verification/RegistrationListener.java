@@ -2,6 +2,7 @@ package com.example.music.backend.verification;
 
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.verification.service.VerificationTokenService;
+import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
@@ -11,17 +12,12 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
+@AllArgsConstructor
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
+
     private MessageSource messages;
     private JavaMailSender mailSender;
     private VerificationTokenService tokenService;
-
-    public RegistrationListener(MessageSource messages, JavaMailSender mailSender,
-                                VerificationTokenService tokenService) {
-        this.messages = messages;
-        this.mailSender = mailSender;
-        this.tokenService = tokenService;
-    }
 
     @Override
     public void onApplicationEvent(OnRegistrationCompleteEvent event) {
