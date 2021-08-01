@@ -3,6 +3,7 @@ package com.example.music.backend.common.security;
 import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
 import com.example.music.backend.user.domain.Role;
 import com.example.music.backend.user.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,11 +16,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-
 @PropertySource("classpath:constants.properties")
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     private static final String COOKIES = "JSESSIONID";
     private final UserService userService;
 
