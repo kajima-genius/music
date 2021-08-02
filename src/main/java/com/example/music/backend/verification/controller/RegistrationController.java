@@ -4,6 +4,7 @@ import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.service.UserService;
 import com.example.music.backend.verification.domain.VerificationToken;
 import com.example.music.backend.verification.service.VerificationTokenService;
+import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,17 +16,12 @@ import java.util.Calendar;
 import java.util.Locale;
 
 @Controller
+@AllArgsConstructor
 public class RegistrationController {
 
     private final UserService userService;
     private final MessageSource messages;
     private final VerificationTokenService tokenService;
-
-    public RegistrationController(UserService userService, MessageSource messages, VerificationTokenService tokenService) {
-        this.userService = userService;
-        this.messages = messages;
-        this.tokenService = tokenService;
-    }
 
     @GetMapping("/registrationConfirm.html")
     public String confirmRegistration

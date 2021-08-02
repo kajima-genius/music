@@ -1,10 +1,16 @@
 package com.example.music.backend.verification.domain;
 
 import com.example.music.backend.user.domain.User;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 public class VerificationToken {
 
@@ -20,42 +26,9 @@ public class VerificationToken {
 
     private Date expiryDate;
 
-
-    public VerificationToken() {
-
-    }
-
     public VerificationToken(String token, User user) {
         this.token = token;
         this.user = user;
         expiryDate = VerificationTokenUtil.calculateExpiryDate();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
     }
 }

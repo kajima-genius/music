@@ -1,13 +1,16 @@
 package com.example.music.backend.user.domain;
 
+import lombok.experimental.UtilityClass;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@UtilityClass
 public class UserUtil {
 
-    public static Date parseDate(String strDate) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY");
+    public Date parseDate(String strDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         try {
             Date date = formatter.parse(strDate);
             return date;
@@ -16,5 +19,4 @@ public class UserUtil {
         }
         return null;
     }
-
 }

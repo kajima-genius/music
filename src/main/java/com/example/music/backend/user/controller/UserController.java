@@ -1,10 +1,12 @@
 package com.example.music.backend.user.controller;
 
+import com.example.music.backend.user.repository.UserRepository;
 import com.example.music.backend.verification.OnRegistrationCompleteEvent;
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.dto.UserDto;
 import com.example.music.backend.user.exception.UserAlreadyExistException;
 import com.example.music.backend.user.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -15,21 +17,19 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller
+@CrossOrigin(origins = "http://localhost:3000")
+@AllArgsConstructor
+@RestController
 public class UserController {
 
     private ApplicationEventPublisher eventPublisher;
     private final UserService service;
     private final PasswordEncoder encoder;
-
-
-    public UserController(UserService service, ApplicationEventPublisher eventPublisher, PasswordEncoder encoder) {
-        this.service = service;
-        this.eventPublisher = eventPublisher;
-        this.encoder = encoder;
-    }
+    private final UserRepository repository;
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, path = "/user/registration")
     public ModelAndView create(@ModelAttribute("UserDto") UserDto userDto,
@@ -48,6 +48,11 @@ public class UserController {
             mav.setViewName("emailError");
         }
         return mav;
+    }
+
+    @GetMapping(path = "/users")
+    public List<User> getClients() {
+        return repository.findAll();
     }
 
     @GetMapping(path = "/user/registration")
