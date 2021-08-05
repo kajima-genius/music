@@ -10,7 +10,7 @@ import java.util.Date;
 public class UserUtil {
 
     public Date parseDate(String strDate) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         try {
             Date date = formatter.parse(strDate);
             return date;
