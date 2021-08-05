@@ -40,3 +40,7 @@ spring:
             client-id: ${MUSIC_GOOGLE_CLIENT_ID}
             client-secret: ${MUSIC_GOOGLE_CLIENT_SECRET}
             scope: email,profile
+
+youtube:
+  api:
+    - ${YOUTUBE_API_KEY}

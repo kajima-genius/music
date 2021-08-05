@@ -8,5 +8,4 @@ public interface VerificationTokenService {
     VerificationToken createVerificationToken(User user, String token);
 
     VerificationToken getVerificationToken(String VerificationToken);
-
 }

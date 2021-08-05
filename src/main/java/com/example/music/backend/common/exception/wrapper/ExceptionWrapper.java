@@ -24,7 +24,6 @@ public class ExceptionWrapper {
         this.errors = errors;
     }
 
-
     public String getMessage() {
         return message;
     }

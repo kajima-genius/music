@@ -35,10 +35,10 @@
                     <h2 class="title">Registration Info</h2>
                     <form th:method="POST"  th:object="${UserDto}">
                         <div class="input-group">
-                            <input class="input--style-3" type="text" placeholder="Name" name="name" th:field="*{userName}">
+                            <input class="input--style-3" type="text" placeholder="Name" name="name" th:field="*{username}">
                         </div>
                         <div class="input-group">
-                            <input class="input--style-3 js-datepicker" type="text" placeholder="Birthdate" name="birthday" th:field="*{dateOfBirch}">
+                            <input class="input--style-3 js-datepicker" type="text" placeholder="Birthdate" name="birthday" th:field="*{dateOfBirth}">
                             <i class="zmdi zmdi-calendar-note input-icon js-btn-calendar"></i>
                         </div>
                         <div class="input-group">

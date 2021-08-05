@@ -4,6 +4,7 @@ import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.service.UserService;
 import com.example.music.backend.verification.domain.VerificationToken;
 import com.example.music.backend.verification.service.VerificationTokenService;
+import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Calendar;
 import java.util.Locale;
 
+@AllArgsConstructor
 @Controller
 public class RegistrationController {
 
@@ -21,13 +23,7 @@ public class RegistrationController {
     private final MessageSource messages;
     private final VerificationTokenService tokenService;
 
-    public RegistrationController(UserService userService, MessageSource messages, VerificationTokenService tokenService) {
-        this.userService = userService;
-        this.messages = messages;
-        this.tokenService = tokenService;
-    }
-
-    @GetMapping("/registrationConfirm.html")
+    @GetMapping("/registrationConfirm")
     public String confirmRegistration
             (WebRequest request, Model model, @RequestParam("token") String token) {
         Locale locale = request.getLocale();

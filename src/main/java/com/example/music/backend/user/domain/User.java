@@ -7,9 +7,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.Date;
 
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -30,7 +30,6 @@ public class User {
     private Role role;
 
     private Date dateOfBirth;
-
     private boolean enabled;
 
     public User(String username, Gender gender, String email, String password, Role role, String strDate) {

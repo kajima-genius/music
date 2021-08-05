@@ -1,6 +1,7 @@
 package com.example.music.backend.common.security;
 
 import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
+import com.example.music.backend.common.security.handler.CustomAuthenticationSuccessHandler;
 import com.example.music.backend.user.domain.Role;
 import com.example.music.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;

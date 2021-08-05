@@ -1,6 +1,5 @@
 package com.example.music.backend.common.exception.handler;
 
-
 import com.example.music.backend.common.exception.NotFoundException;
 import com.example.music.backend.common.exception.wrapper.ExceptionWrapper;
 import com.example.music.backend.user.exception.UserAlreadyExistException;

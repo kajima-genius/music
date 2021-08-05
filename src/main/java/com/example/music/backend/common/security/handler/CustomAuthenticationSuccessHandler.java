@@ -1,4 +1,4 @@
-package com.example.music.backend.common.security;
+package com.example.music.backend.common.security.handler;
 
 import com.example.music.backend.user.service.UserService;
 import org.springframework.security.core.Authentication;
