@@ -1,19 +1,24 @@
 package com.example.music.backend.user.service;
 
+import com.example.music.backend.common.exception.NotFoundException;
 import com.example.music.backend.user.converter.UserDtoMapper;
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.dto.UserDto;
 import com.example.music.backend.user.exception.UserAlreadyExistException;
 import com.example.music.backend.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
 
     private boolean emailExist(String email) {
         return userRepository.findByEmail(email).isPresent();
@@ -31,6 +36,8 @@ public class UserServiceImpl implements UserService {
                     + dto.getEmail());
         }
 
+        String encodedPassword = encoder.encode(dto.getPassword());
+        dto.setPassword(encodedPassword);
         User newUser = UserDtoMapper.INSTANCE.toEntity(dto);
         return userRepository.save(newUser);
     }
@@ -43,5 +50,12 @@ public class UserServiceImpl implements UserService {
             newUser.setEnabled(true);
             userRepository.save(newUser);
         }
+    }
+
+    @Override
+    public UserDto getDto(String email) {
+        User entity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User with email" + email + "not found"));
+        return UserDtoMapper.INSTANCE.toDto(entity);
     }
 }

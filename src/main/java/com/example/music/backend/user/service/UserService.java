@@ -11,4 +11,6 @@ public interface UserService {
     User create(UserDto dto);
 
     void processOAuthPostLogin(OAuth2User oAuth2User);
+
+    UserDto getDto(String email);
 }
