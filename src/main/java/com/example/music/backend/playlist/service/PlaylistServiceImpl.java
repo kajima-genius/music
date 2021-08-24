@@ -69,8 +69,9 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Override
     public void removeVideo(Long playlistId, YoutubeVideoDto videoDto) {
         YoutubeVideo removedVideo = YoutubeVideoDtoMapper.INSTANCE.toEntity(videoDto);
-        if (existsVideosInMultiplyPlaylists(videoDto))
-            videoService.delete(videoDto.getId());
+        if (!existsVideosInMultiplyPlaylists(videoDto)) {
+            videoService.delete(videoDto.getYoutubeId());
+        }
         playlistRepository.findById(playlistId).get().getVideos().remove(removedVideo);
     }
 

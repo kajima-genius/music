@@ -1,7 +1,7 @@
 package com.example.music.backend.video.service;
 
-import com.example.music.backend.common.exception.NotFoundException;
-import com.example.music.backend.video.converter.YoutubeVideoDtoMapper;
+import com.example.music.backend.video.common.CheckedFunction;
+import com.example.music.backend.video.converter.VideoYoutubeVideoResponseMapper;
 import com.example.music.backend.video.converter.YoutubeVideoResponseMapper;
 import com.example.music.backend.video.domain.YoutubeVideo;
 import com.example.music.backend.video.dto.YoutubeVideoDto;
@@ -21,54 +21,62 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class YoutubeVideoServiceImpl implements YoutubeVideoService {
 
-    private static final Long MAX_SEARCH_RESULTS = 50L;
+    @Value("${youtube.key}")
+    private String YOUTUBE_API_KEY;
+
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
-    private static final Long MAX_TRENDS_VIDEOS = 20L;
 
     private final YoutubeVideoRepository youtubeVideoRepository;
-    private YouTube youtube = getService();
+    private YouTube youtube;
 
     public boolean videoExist(String youtubeId) {
         return youtubeVideoRepository.findByYoutubeId(youtubeId).isPresent();
     }
 
-    private YouTube getService() {
-        return new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
+    @PostConstruct
+    private void initializationYoutube() {
+        this.youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
             public void initialize(HttpRequest request) {
             }
         }).setApplicationName("YoutubeVideo")
-                .setYouTubeRequestInitializer(new YouTubeRequestInitializer("AIzaSyC5k0VruOYaTht90TTecW237lLLgOQ7s4g")).build();
+                .setYouTubeRequestInitializer(new YouTubeRequestInitializer(YOUTUBE_API_KEY)).build();
     }
 
-    private YoutubeVideoResponse save(YoutubeVideoDto youtubeVideoDto) {
-        YoutubeVideo newVideo = YoutubeVideoDtoMapper.INSTANCE.toEntity(youtubeVideoDto);
-        return YoutubeVideoResponseMapper.INSTANCE.toResponse(youtubeVideoRepository.save(newVideo));
+    private void save(YoutubeVideoDto youtubeVideoDto) {
+        YoutubeVideo newVideo = new YoutubeVideo(youtubeVideoDto.getYoutubeId());
+        YoutubeVideoResponseMapper.INSTANCE.toResponse(youtubeVideoRepository.save(newVideo));
     }
 
-    private List<YoutubeVideoResponse> fromYoutubeSearchFormatToResponse(Iterator<SearchResult> iterator) {
+    private List<YoutubeVideoResponse> fromYoutubeSearchFormatToResponse(List<SearchResult> searchResults) throws IOException {
         List<YoutubeVideoResponse> results = new ArrayList<>();
 
+        List<YoutubeVideoResponse> responses = searchResults.stream().map(
+                x -> getYoutubeVideo(x.getId().getVideoId()))
+                .collect(Collectors.toList());
+
+        Iterator<YoutubeVideoResponse> iterator = responses.iterator();
+
         while (iterator.hasNext()) {
-            SearchResult singleVideo = iterator.next();
-            results.add(new YoutubeVideoResponse(
-                    singleVideo.getId().getVideoId(),
-                    singleVideo.getSnippet().getChannelId(),
-                    singleVideo.getSnippet().getTitle(),
-                    singleVideo.getSnippet().getThumbnails().getMedium().getUrl(),
-                    1L,
-                    singleVideo.getSnippet().getChannelTitle(),
-                    singleVideo.getSnippet().getPublishedAt().getValue()));
+            String description = searchResults.iterator().next().getSnippet().getDescription();
+            YoutubeVideoResponse addedVideo = iterator.next();
+            addedVideo.setDescription(description);
+            results.add(addedVideo);
         }
 
         return results;
@@ -79,30 +87,36 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
 
         while (iterator.hasNext()) {
             Video singleVideo = iterator.next();
-            results.add(new YoutubeVideoResponse(
-                    singleVideo.getId(),
-                    singleVideo.getSnippet().getChannelId(),
-                    singleVideo.getSnippet().getTitle(),
-                    singleVideo.getSnippet().getThumbnails().getMedium().getUrl(),
-                    singleVideo.getStatistics().getViewCount().longValue(),
-                    singleVideo.getSnippet().getChannelTitle(),
-                    singleVideo.getSnippet().getPublishedAt().getValue()));
+            YoutubeVideoResponse addedVideo = VideoYoutubeVideoResponseMapper
+                    .INSTANCE.toResponse(singleVideo);
+            results.add(addedVideo);
         }
         return results;
     }
 
+    private <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction) {
+        return t -> {
+            try {
+                return checkedFunction.apply(t);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
     @Override
-    public List<YoutubeVideoResponse> searchYoutubeVideo(String queryTerm) {
+    public List<YoutubeVideoResponse> searchYoutubeVideo(String queryTerm, Long maxResults) {
         try {
             YouTube.Search.List request = youtube.search().list("id,snippet");
 
             SearchListResponse response = request
                     .setQ(queryTerm)
                     .setType("video")
-                    .setMaxResults(MAX_SEARCH_RESULTS)
+                    .setMaxResults(maxResults)
                     .execute();
 
-            return fromYoutubeSearchFormatToResponse(response.getItems().iterator());
+
+            return fromYoutubeSearchFormatToResponse(response.getItems());
 
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
@@ -114,13 +128,13 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
     }
 
     @Override
-    public List<YoutubeVideoResponse> getYoutubeVideoTrends() {
+    public List<YoutubeVideoResponse> getYoutubeVideoTrends(Long maxResults) {
         try {
             YouTube.Videos.List request = youtube.videos()
                     .list("snippet,contentDetails,statistics");
             VideoListResponse response = request.setChart("mostPopular")
                     .setRegionCode("US")
-                    .setMaxResults(MAX_TRENDS_VIDEOS)
+                    .setMaxResults(maxResults)
                     .execute();
             return fromYoutubeFormatToResponse(response.getItems().iterator());
         } catch (GoogleJsonResponseException e) {
@@ -133,20 +147,30 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
     }
 
     @Override
-    public YoutubeVideoResponse addNewVideo(YoutubeVideoDto youtubeVideoDto) {
-        if (videoExist(youtubeVideoDto.getYoutubeId()))
-            return YoutubeVideoResponseMapper.INSTANCE.toResponse(YoutubeVideoDtoMapper.INSTANCE.toEntity(youtubeVideoDto));
-        else return save(youtubeVideoDto);
+    public void addNewVideo(YoutubeVideoDto youtubeVideoDto) {
+        if (!videoExist(youtubeVideoDto.getYoutubeId())) {
+            save(youtubeVideoDto);
+        }
     }
 
     @Override
     public YoutubeVideoResponse getYoutubeVideo(String youtubeId) {
-        return YoutubeVideoResponseMapper.INSTANCE.toResponse(youtubeVideoRepository.findByYoutubeId(youtubeId)
-                .orElseThrow(() -> new NotFoundException("Video with id: " + youtubeId + "not found")));
+        try {
+            Video video = youtube.videos()
+                    .list("snippet,contentDetails,statistics")
+                    .setId(youtubeId)
+                    .execute()
+                    .getItems().get(0);
+            return VideoYoutubeVideoResponseMapper.INSTANCE.toResponse(video);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
-    public void delete(Long id) {
-        youtubeVideoRepository.deleteById(id);
+    public void delete(String youtubeId) {
+        Long videoId = youtubeVideoRepository.findByYoutubeId(youtubeId).get().getId();
+        youtubeVideoRepository.deleteById(videoId);
     }
 }

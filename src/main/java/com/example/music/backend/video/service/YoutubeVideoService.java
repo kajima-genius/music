@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface YoutubeVideoService {
 
-    List<YoutubeVideoResponse> searchYoutubeVideo(String queryTerm);
+    List<YoutubeVideoResponse> searchYoutubeVideo(String queryTerm, Long maxResults);
 
-    List<YoutubeVideoResponse> getYoutubeVideoTrends();
+    List<YoutubeVideoResponse> getYoutubeVideoTrends(Long maxResults);
 
-    YoutubeVideoResponse addNewVideo(YoutubeVideoDto youtubeVideoDto);
+    void addNewVideo(YoutubeVideoDto youtubeVideoDto);
 
     YoutubeVideoResponse getYoutubeVideo(String youtubeId);
 
-    void delete(Long id);
+    void delete(String youtubeId);
 }

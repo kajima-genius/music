@@ -1,0 +1,22 @@
+.app__mainpage {
+    display: flex;
+}
+
+a {
+    text-decoration: inherit;
+    color: inherit;
+}
+
+.loading {
+    display: block !important;
+    width: 50%;
+    margin: auto;
+}
+
+.s-alert-box {
+    min-width: 250px;
+}
+
+.s-alert-close::before, .s-alert-close::after {
+    width: 2px;
+}

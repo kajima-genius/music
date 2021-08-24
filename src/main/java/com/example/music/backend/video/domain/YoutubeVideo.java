@@ -20,19 +20,10 @@ public class YoutubeVideo {
     private Long id;
 
     private String youtubeId;
-    private Long viewCount;
-    private String title;
-    private String channelTitle;
-    private String description;
-    private String imageUrl;
 
-    public YoutubeVideo(String youtubeId, Long viewCount, String title, String channelTitle, String description, String imageUrl) {
+    public YoutubeVideo(String youtubeId) {
         this.youtubeId = youtubeId;
-        this.viewCount = viewCount;
-        this.title = title;
-        this.channelTitle = channelTitle;
-        this.description = description;
-        this.imageUrl = imageUrl;
+
     }
 
     @Override
@@ -42,6 +33,6 @@ public class YoutubeVideo {
         }
 
         YoutubeVideo video = (YoutubeVideo) obj;
-        return (this.id == video.id) && (this.youtubeId.equals(video.youtubeId));
+        return (this.youtubeId.equals(video.youtubeId));
     }
 }

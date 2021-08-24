@@ -7,12 +7,9 @@ import lombok.Setter;
 @Setter
 public class YoutubeVideoDto {
 
-    private Long id;
     private String youtubeId;
-    private String title;
 
-    public YoutubeVideoDto(String youtubeId, String title, String link) {
+    public YoutubeVideoDto(String youtubeId) {
         this.youtubeId = youtubeId;
-        this.title = title;
     }
 }
