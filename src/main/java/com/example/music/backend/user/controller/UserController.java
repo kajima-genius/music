@@ -8,7 +8,6 @@ import com.example.music.backend.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -37,12 +36,5 @@ public class UserController {
         String appUrl = request.getContextPath();
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, request.getLocale(), appUrl));
         return ResponseEntity.created(URI.create("/users" + response.getId())).body(response);
-    }
-
-    @GetMapping("/current")
-    public ResponseEntity<UserResponse> getCurrentUser() {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserResponse response = service.getUserByEmail(userEmail);
-        return ResponseEntity.ok(response);
     }
 }

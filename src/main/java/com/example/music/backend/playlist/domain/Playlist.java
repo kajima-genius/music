@@ -1,18 +1,19 @@
 package com.example.music.backend.playlist.domain;
 
 import com.example.music.backend.user.domain.User;
-import com.example.music.backend.video.domain.YoutubeVideo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
+@Table(name = "playlists")
 public class Playlist {
 
     @Id
@@ -25,13 +26,12 @@ public class Playlist {
     @ManyToOne
     private User owner;
 
-    @OneToMany
-    private List<YoutubeVideo> videos;
+    @ElementCollection
+    @CollectionTable(name = "VIDEOS")
+    @Column(name = "YOUTUBE_ID")
+    private List<String> listYoutubeId = new ArrayList<>();
 
-    public Playlist(String name, Long countVideos, User owner, List<YoutubeVideo> videos) {
-        this.name = name;
-        this.countVideos = countVideos;
-        this.owner = owner;
-        this.videos = videos;
+    public Long getCountVideos() {
+        return listYoutubeId.stream().count();
     }
 }

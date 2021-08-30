@@ -1,11 +1,6 @@
 package com.example.music.backend.video.service;
 
-import com.example.music.backend.video.common.CheckedFunction;
 import com.example.music.backend.video.converter.VideoYoutubeVideoResponseMapper;
-import com.example.music.backend.video.converter.YoutubeVideoResponseMapper;
-import com.example.music.backend.video.domain.YoutubeVideo;
-import com.example.music.backend.video.dto.YoutubeVideoDto;
-import com.example.music.backend.video.repository.YoutubeVideoRepository;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -29,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -42,12 +36,7 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
 
-    private final YoutubeVideoRepository youtubeVideoRepository;
     private YouTube youtube;
-
-    public boolean videoExist(String youtubeId) {
-        return youtubeVideoRepository.findByYoutubeId(youtubeId).isPresent();
-    }
 
     @PostConstruct
     private void initializationYoutube() {
@@ -56,11 +45,6 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
             }
         }).setApplicationName("YoutubeVideo")
                 .setYouTubeRequestInitializer(new YouTubeRequestInitializer(YOUTUBE_API_KEY)).build();
-    }
-
-    private void save(YoutubeVideoDto youtubeVideoDto) {
-        YoutubeVideo newVideo = new YoutubeVideo(youtubeVideoDto.getYoutubeId());
-        YoutubeVideoResponseMapper.INSTANCE.toResponse(youtubeVideoRepository.save(newVideo));
     }
 
     private List<YoutubeVideoResponse> fromYoutubeSearchFormatToResponse(List<SearchResult> searchResults) throws IOException {
@@ -94,16 +78,6 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
         return results;
     }
 
-    private <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction) {
-        return t -> {
-            try {
-                return checkedFunction.apply(t);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
-    }
-
     @Override
     public List<YoutubeVideoResponse> searchYoutubeVideo(String queryTerm, Long maxResults) {
         try {
@@ -114,7 +88,6 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
                     .setType("video")
                     .setMaxResults(maxResults)
                     .execute();
-
 
             return fromYoutubeSearchFormatToResponse(response.getItems());
 
@@ -147,13 +120,6 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
     }
 
     @Override
-    public void addNewVideo(YoutubeVideoDto youtubeVideoDto) {
-        if (!videoExist(youtubeVideoDto.getYoutubeId())) {
-            save(youtubeVideoDto);
-        }
-    }
-
-    @Override
     public YoutubeVideoResponse getYoutubeVideo(String youtubeId) {
         try {
             Video video = youtube.videos()
@@ -166,11 +132,5 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public void delete(String youtubeId) {
-        Long videoId = youtubeVideoRepository.findByYoutubeId(youtubeId).get().getId();
-        youtubeVideoRepository.deleteById(videoId);
     }
 }

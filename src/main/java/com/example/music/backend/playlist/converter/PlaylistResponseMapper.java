@@ -13,7 +13,7 @@ public interface PlaylistResponseMapper {
 
     PlaylistResponseMapper INSTANCE = Mappers.getMapper(PlaylistResponseMapper.class);
 
-    @Mapping(target = "userId", expression = "java(entity.getOwner().getId())")
+    @Mapping(target = "ownerId", expression = "java(entity.getOwner().getId())")
     PlaylistResponse toResponse(Playlist entity);
 
     List<PlaylistResponse> listEntityToResponse(List<Playlist> entities);

@@ -12,6 +12,4 @@ public interface UserDtoMapper {
 
     @Mapping(target = "dateOfBirth", dateFormat = "dd/MM/yyyy")
     User toEntity(UserDto dto);
-
-    UserDto toDto(User entity);
 }

@@ -1,13 +1,10 @@
 package com.example.music.backend.playlist.controller;
 
-import com.example.music.backend.playlist.converter.PlaylistResponseMapper;
-import com.example.music.backend.playlist.domain.Playlist;
 import com.example.music.backend.playlist.dto.PlaylistDto;
 import com.example.music.backend.playlist.response.PlaylistResponse;
 import com.example.music.backend.playlist.service.PlaylistService;
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.service.UserService;
-import com.example.music.backend.video.converter.YoutubeVideoResponseMapper;
 import com.example.music.backend.video.dto.YoutubeVideoDto;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 import lombok.AllArgsConstructor;
@@ -31,9 +28,9 @@ public class PlaylistController {
     @PutMapping(value = "/{playlistId}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<YoutubeVideoResponse>> addVideoToPlaylist(
             @PathVariable("playlistId") Long playlistId,
-            @RequestBody YoutubeVideoDto videoDto) {
+            @RequestBody YoutubeVideoDto dto) {
 
-        playlistService.addVideo(playlistId, videoDto);
+        playlistService.addVideo(playlistId, dto.getYoutubeId());
         List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
         return ResponseEntity.ok(videos);
     }
@@ -41,16 +38,23 @@ public class PlaylistController {
     @DeleteMapping(value = "/{playlistId}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<YoutubeVideoResponse>> removeVideoFromPlaylist(
             @PathVariable("playlistId") Long playlistId,
-            @RequestBody YoutubeVideoDto videoDto) {
+            String youtubeId) {
 
-        playlistService.removeVideo(playlistId, videoDto);
+        playlistService.removeVideo(playlistId, youtubeId);
         List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
         return ResponseEntity.ok(videos);
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<PlaylistResponse> create(@RequestBody PlaylistDto playlistDto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = userService.getUserByEmail(
+                        SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                .getId();
+        User user = new User();
+        user.setId(userId);
         PlaylistResponse response = playlistService.create(playlistDto, user);
         return ResponseEntity.created(URI.create("/playlists" + response.getId())).body(response);
     }
@@ -58,10 +62,10 @@ public class PlaylistController {
     @GetMapping("/user/all")
     public ResponseEntity<List<PlaylistResponse>> getAllPlaylists() {
         Long userId = userService.getUserByEmail(
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName())
+                        SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
                 .getId();
         List<PlaylistResponse> response = playlistService.getPlaylistsByUserId(userId);
         return ResponseEntity.ok(response);

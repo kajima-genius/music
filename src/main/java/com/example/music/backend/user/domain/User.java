@@ -1,11 +1,14 @@
 package com.example.music.backend.user.domain;
 
+import com.example.music.backend.playlist.domain.Playlist;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter

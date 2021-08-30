@@ -3,7 +3,6 @@ package com.example.music.backend.playlist.service;
 import com.example.music.backend.playlist.dto.PlaylistDto;
 import com.example.music.backend.playlist.response.PlaylistResponse;
 import com.example.music.backend.user.domain.User;
-import com.example.music.backend.video.dto.YoutubeVideoDto;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public interface PlaylistService {
 
     void delete(Long id);
 
-    void addVideo(Long playlistId, YoutubeVideoDto videoDto);
+    void addVideo(Long playlistId, String youtubeId);
 
-    void removeVideo(Long playlistId, YoutubeVideoDto videoDto);
+    void removeVideo(Long playlistId, String youtubeId);
 }

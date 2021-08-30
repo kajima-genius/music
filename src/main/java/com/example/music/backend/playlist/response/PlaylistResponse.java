@@ -1,7 +1,6 @@
 package com.example.music.backend.playlist.response;
 
-import com.example.music.backend.video.domain.YoutubeVideo;
-import lombok.AllArgsConstructor;
+import com.example.music.backend.video.response.YoutubeVideoResponse;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +15,6 @@ public class PlaylistResponse {
     private Long id;
     private String name;
     private Long countVideos;
-    private Long userId;
-    private List<YoutubeVideo> videos;
+    private Long ownerId;
+    private List<YoutubeVideoResponse> videos;
 }

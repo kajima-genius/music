@@ -8,16 +8,13 @@ import com.example.music.backend.playlist.dto.PlaylistDto;
 import com.example.music.backend.playlist.repository.PlaylistRepository;
 import com.example.music.backend.playlist.response.PlaylistResponse;
 import com.example.music.backend.user.domain.User;
-import com.example.music.backend.video.converter.YoutubeVideoDtoMapper;
-import com.example.music.backend.video.converter.YoutubeVideoResponseMapper;
-import com.example.music.backend.video.domain.YoutubeVideo;
-import com.example.music.backend.video.dto.YoutubeVideoDto;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 import com.example.music.backend.video.service.YoutubeVideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -25,14 +22,6 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final YoutubeVideoService videoService;
-
-    private boolean existsVideosInMultiplyPlaylists(YoutubeVideoDto videoDto) {
-        YoutubeVideo video = YoutubeVideoDtoMapper.INSTANCE.toEntity(videoDto);
-        Long numberOfVideoRepetitions = playlistRepository.findAll().stream()
-                .mapToLong(x -> x.getVideos().contains(video) ? 1 : 0)
-                .sum();
-        return numberOfVideoRepetitions >= 2 ? true : false;
-    }
 
     @Override
     public List<PlaylistResponse> getPlaylistsByUserId(Long userId) {
@@ -58,26 +47,24 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
-    public void addVideo(Long playlistId, YoutubeVideoDto videoDto) {
-        videoService.addNewVideo(videoDto);
-        YoutubeVideo addedVideo = YoutubeVideoDtoMapper.INSTANCE.toEntity(videoDto);
+    public void addVideo(Long playlistId, String youtubeId) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist with id: " + playlistId + " not found"));
-        playlist.getVideos().add(addedVideo);
+        if (!playlist.getListYoutubeId().contains(youtubeId)) {
+            playlist.getListYoutubeId().add(youtubeId);
+            playlistRepository.save(playlist);
+        }
     }
 
     @Override
-    public void removeVideo(Long playlistId, YoutubeVideoDto videoDto) {
-        YoutubeVideo removedVideo = YoutubeVideoDtoMapper.INSTANCE.toEntity(videoDto);
-        if (!existsVideosInMultiplyPlaylists(videoDto)) {
-            videoService.delete(videoDto.getYoutubeId());
-        }
-        playlistRepository.findById(playlistId).get().getVideos().remove(removedVideo);
+    public void removeVideo(Long playlistId, String youtubeId) {
+        playlistRepository.findById(playlistId).get().getListYoutubeId().remove(youtubeId);
     }
 
     @Override
     public List<YoutubeVideoResponse> getAllVideoInPlaylist(Long playlistId) {
-        return YoutubeVideoResponseMapper.INSTANCE.listEntityToListResponse(
-                playlistRepository.findById(playlistId).get().getVideos());
+        return playlistRepository.findById(playlistId).get().getListYoutubeId().stream()
+                .map(x -> videoService.getYoutubeVideo(x))
+                .collect(Collectors.toList());
     }
 }

@@ -14,11 +14,6 @@ public interface PlaylistDtoMapper {
     PlaylistDtoMapper INSTANCE = Mappers.getMapper(PlaylistDtoMapper.class);
 
     @Mapping(target = "owner", source = "user")
-    @Mapping(target = "id", expression = "java(dto.getId())")
+    @Mapping(target = "id", ignore = true)
     Playlist toEntity(PlaylistDto dto, User user);
-
-//    @Mapping(target = "userId", expression = "java(entity.getOwner().getId())")
-//    PlaylistDto toDto(Playlist entity);
-//
-//    List<PlaylistDto> listEntityToListDto(List<Playlist> entities);
 }

@@ -9,7 +9,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
 
@@ -18,14 +17,6 @@ public class UserDto {
     private Long id;
     private String email;
     private String password;
-    private Role role;
+    private Role role = Role.USER;
     private String dateOfBirth;
-
-    public UserDto(String username, Gender gender, String email, String password, String dateOfBirth) {
-        this.username = username;
-        this.gender = gender;
-        this.email = email;
-        this.password = password;
-        this.dateOfBirth = dateOfBirth;
-    }
 }

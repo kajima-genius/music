@@ -1,6 +1,5 @@
 package com.example.music.backend.common.security;
 
-import com.example.music.backend.user.domain.Role;
 import com.example.music.backend.user.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
