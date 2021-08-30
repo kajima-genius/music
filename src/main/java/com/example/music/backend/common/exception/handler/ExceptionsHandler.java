@@ -34,12 +34,6 @@ public class ExceptionsHandler {
         return new ExceptionWrapper(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(BAD_REQUEST)
-    public ExceptionWrapper handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        return new ExceptionWrapper(BAD_REQUEST, parseErrors(exception.getAllErrors()));
-    }
-
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(NOT_FOUND)
     public ExceptionWrapper handleNoHandlerFoundException(NoHandlerFoundException exception) {
@@ -50,6 +44,12 @@ public class ExceptionsHandler {
     @ResponseStatus(METHOD_NOT_ALLOWED)
     public ExceptionWrapper handleMethodNotAllowedException(HttpClientErrorException.MethodNotAllowed exception) {
         return new ExceptionWrapper(METHOD_NOT_ALLOWED, "An attempt to use a method that does not exist!");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ExceptionWrapper handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        return new ExceptionWrapper(BAD_REQUEST, parseErrors(exception.getAllErrors()));
     }
 
     private List<String> parseErrors(List<ObjectError> errors) {

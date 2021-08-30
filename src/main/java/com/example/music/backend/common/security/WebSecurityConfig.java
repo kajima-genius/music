@@ -2,6 +2,7 @@ package com.example.music.backend.common.security;
 
 import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
 import com.example.music.backend.user.domain.Role;
+import com.example.music.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +15,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
+
 @PropertySource("classpath:constants.properties")
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String COOKIES = "JSESSIONID";
+    private final UserService userService;
 
     @Value("${maximum.session.count}")
     private int MAXIMUM_SESSIONS_COUNT;
@@ -26,8 +29,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
 
-    public WebSecurityConfig(final UserDetailsService userDetailsService,
-                             final PasswordEncoder encoder) {
+    public WebSecurityConfig(UserService userService, UserDetailsService userDetailsService, PasswordEncoder encoder) {
+        this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.encoder = encoder;
     }
@@ -63,16 +66,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .authorizeRequests()
 
-                .antMatchers("/").permitAll()
-                .antMatchers("/h2-console/**", "/login*", "/user/registration").permitAll()
+                .antMatchers("/h2-console/**", "/login**", "/user/registration", "/oauth2**").permitAll()
 
                 .antMatchers("/admin/**")
                 .hasAnyAuthority(Role.ADMIN.name())
 
                 .and()
-                .formLogin().loginPage("/login")
-                .defaultSuccessUrl("/home").failureUrl("/login?error").permitAll()
-                .and().logout().logoutSuccessUrl("/").permitAll()
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/perform-login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/home")
+                .and()
+                .oauth2Login()
+                .loginPage("/login")
+                .userInfoEndpoint()
+                .and()
+                .successHandler(new CustomAuthenticationSuccessHandler(userService))
 
                 .and()
                 .logout()
@@ -87,5 +98,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.headers().frameOptions().disable();
     }
-
 }

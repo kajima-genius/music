@@ -2,6 +2,7 @@ package com.example.music.backend.verification;
 
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.verification.service.VerificationTokenService;
+import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
@@ -11,17 +12,12 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
+@AllArgsConstructor
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
+
     private MessageSource messages;
     private JavaMailSender mailSender;
     private VerificationTokenService tokenService;
-
-    public RegistrationListener(MessageSource messages, JavaMailSender mailSender,
-                                VerificationTokenService tokenService) {
-        this.messages = messages;
-        this.mailSender = mailSender;
-        this.tokenService = tokenService;
-    }
 
     @Override
     public void onApplicationEvent(OnRegistrationCompleteEvent event) {
@@ -35,11 +31,10 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";
-        String confirmationUrl
-                = event.getAppUrl() + "/registrationConfirm.html?token=" + token;
+        String confirmationUrl = event.getAppUrl() + "/registrationConfirm.html?token=" + token;
         String message = messages.getMessage("message.regSucc", null, event.getLocale());
 
-        SimpleMailMessage email = createEmail(recipientAddress,subject,message,confirmationUrl);
+        SimpleMailMessage email = createEmail(recipientAddress, subject, message, confirmationUrl);
         mailSender.send(email);
     }
 
@@ -49,6 +44,6 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         email.setTo(recipientAddress);
         email.setSubject(subject);
         email.setText(message + "\r\n" + "http://localhost:8080" + confirmationUrl);
-        return  email;
+        return email;
     }
 }
