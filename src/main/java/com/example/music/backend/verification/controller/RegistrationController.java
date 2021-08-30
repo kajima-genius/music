@@ -5,16 +5,16 @@ import com.example.music.backend.user.service.UserService;
 import com.example.music.backend.verification.domain.VerificationToken;
 import com.example.music.backend.verification.service.VerificationTokenService;
 import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-@RestController
+@Controller
 public class RegistrationController {
 
     private final UserService userService;
@@ -34,24 +34,24 @@ public class RegistrationController {
 
         VerificationToken verificationToken = tokenService.getVerificationToken(token);
 
-        if(verificationToken == null) {
+        if (verificationToken == null) {
             String message = messages.getMessage("auth.message.expired", null, locale);
             model.addAttribute("message", message);
-            return "redirect:/badUser.html?lang=" + locale.getLanguage();
+            return "badUser";
         }
 
         User user = verificationToken.getUser();
         Calendar cal = Calendar.getInstance();
 
-        if(verificationToken.getExpiryDate().getTime() - cal.getTime().getTime() <= 0) {
+        if (verificationToken.getExpiryDate().before(cal.getTime())) {
             String messageValue = messages.getMessage("auth.message.expired", null, locale);
             model.addAttribute("message", messageValue);
-            return "redirect:/badUser.html?lang=" + locale.getLanguage();
+            return "badUser";
         }
 
         user.setEnabled(true);
         userService.saveRegisteredUser(user);
-        return "redirect:/login.html?lang=" + request.getLocale().getLanguage();
+        return "login" ;
     }
 
 }

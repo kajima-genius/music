@@ -6,18 +6,18 @@ import com.example.music.backend.verification.repository.VerificationTokenReposi
 import org.springframework.stereotype.Service;
 
 @Service
-public class VerificationTokenServiceV1 implements VerificationTokenService {
+public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     private final VerificationTokenRepository tokenRepository;
 
-    public VerificationTokenServiceV1(VerificationTokenRepository tokenRepository) {
+    public VerificationTokenServiceImpl(VerificationTokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
     }
 
     @Override
-    public void createVerificationToken(User user, String token) {
+    public VerificationToken createVerificationToken(User user, String token) {
         VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
+        return tokenRepository.save(myToken);
     }
 
     @Override
