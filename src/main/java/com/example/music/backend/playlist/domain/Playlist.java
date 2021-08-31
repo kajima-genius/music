@@ -29,7 +29,6 @@ public class Playlist {
     @ElementCollection
     @CollectionTable(name = "VIDEOS")
     @Column(name = "YOUTUBE_ID")
-    @OrderColumn
     private List<String> listYoutubeId = new ArrayList<>();
 
     public Long getCountVideos() {

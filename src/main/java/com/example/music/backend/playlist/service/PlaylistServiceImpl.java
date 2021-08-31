@@ -52,6 +52,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .orElseThrow(() -> new NotFoundException("Playlist with id: " + playlistId + " not found"));
         if (!playlist.getListYoutubeId().contains(youtubeId)) {
             playlist.getListYoutubeId().add(youtubeId);
+            playlistRepository.save(playlist);
         }
     }
 
