@@ -1,8 +1,7 @@
 package com.example.music.backend.playlist.service;
 
 import com.example.music.backend.common.exception.NotFoundException;
-import com.example.music.backend.playlist.converter.PlaylistDtoMapper;
-import com.example.music.backend.playlist.converter.PlaylistResponseMapper;
+import com.example.music.backend.playlist.converter.PlaylistMapper;
 import com.example.music.backend.playlist.domain.Playlist;
 import com.example.music.backend.playlist.dto.PlaylistDto;
 import com.example.music.backend.playlist.repository.PlaylistRepository;
@@ -25,20 +24,20 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public List<PlaylistResponse> getPlaylistsByUserId(Long userId) {
-        return PlaylistResponseMapper.INSTANCE
+        return PlaylistMapper.INSTANCE
                 .listEntityToResponse(playlistRepository.findByOwnerId(userId));
     }
 
     @Override
     public PlaylistResponse getPlaylistById(Long playlistId) {
-        return PlaylistResponseMapper.INSTANCE.toResponse(playlistRepository.findById(playlistId)
+        return PlaylistMapper.INSTANCE.toResponse(playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist with id: " + playlistId + " not found")));
     }
 
     @Override
     public PlaylistResponse create(PlaylistDto playlistDto, User user) {
-        Playlist saved = PlaylistDtoMapper.INSTANCE.toEntity(playlistDto, user);
-        return PlaylistResponseMapper.INSTANCE.toResponse(playlistRepository.save(saved));
+        Playlist saved = PlaylistMapper.INSTANCE.toEntity(playlistDto, user);
+        return PlaylistMapper.INSTANCE.toResponse(playlistRepository.save(saved));
     }
 
     @Override

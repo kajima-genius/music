@@ -7,9 +7,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "string")
-public interface VideoYoutubeVideoResponseMapper {
+public interface VideoMapper {
 
-    VideoYoutubeVideoResponseMapper INSTANCE = Mappers.getMapper(VideoYoutubeVideoResponseMapper.class);
+    VideoMapper INSTANCE = Mappers.getMapper(VideoMapper.class);
 
     @Mapping(target = "youtubeId", expression = "java(video.getId())")
     @Mapping(target = "channelId", expression = "java(video.getSnippet().getChannelId())")

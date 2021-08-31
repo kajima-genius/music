@@ -1,6 +1,6 @@
 package com.example.music.backend.video.service;
 
-import com.example.music.backend.video.converter.VideoYoutubeVideoResponseMapper;
+import com.example.music.backend.video.converter.VideoMapper;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -71,7 +71,7 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
 
         while (iterator.hasNext()) {
             Video singleVideo = iterator.next();
-            YoutubeVideoResponse addedVideo = VideoYoutubeVideoResponseMapper
+            YoutubeVideoResponse addedVideo = VideoMapper
                     .INSTANCE.toResponse(singleVideo);
             results.add(addedVideo);
         }
@@ -127,7 +127,7 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
                     .setId(youtubeId)
                     .execute()
                     .getItems().get(0);
-            return VideoYoutubeVideoResponseMapper.INSTANCE.toResponse(video);
+            return VideoMapper.INSTANCE.toResponse(video);
         } catch (IOException e) {
             e.printStackTrace();
         }

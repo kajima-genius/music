@@ -1,8 +1,7 @@
 package com.example.music.backend.user.service;
 
 import com.example.music.backend.common.exception.NotFoundException;
-import com.example.music.backend.user.converter.UserDtoMapper;
-import com.example.music.backend.user.converter.UserResponseMapper;
+import com.example.music.backend.user.converter.UserMapper;
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.dto.UserDto;
 import com.example.music.backend.user.exception.UserAlreadyExistException;
@@ -38,8 +37,8 @@ public class UserServiceImpl implements UserService {
 
         String encodedPassword = encoder.encode(dto.getPassword());
         dto.setPassword(encodedPassword);
-        User newUser = UserDtoMapper.INSTANCE.toEntity(dto);
-        return UserResponseMapper.INSTANCE.toResponse(userRepository.save(newUser));
+        User newUser = UserMapper.INSTANCE.toEntity(dto);
+        return UserMapper.INSTANCE.toResponse(userRepository.save(newUser));
     }
 
     @Override
@@ -56,7 +55,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserByEmail(String email) {
         User entity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User with email" + email + "not found"));
-        UserResponse response = UserResponseMapper.INSTANCE.toResponse(entity);
+        UserResponse response = UserMapper.INSTANCE.toResponse(entity);
         return response;
     }
 }

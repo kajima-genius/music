@@ -21,14 +21,14 @@ public class Playlist {
     private Long id;
 
     private String name;
-    private Long countVideos;
+    private Long countVideos = 0L;
 
     @ManyToOne
     private User owner;
 
     @ElementCollection
-    @CollectionTable(name = "VIDEOS")
-    @Column(name = "YOUTUBE_ID")
+    @CollectionTable(name = "videos")
+    @Column(name = "youtubeId")
     private List<String> listYoutubeId = new ArrayList<>();
 
     public Long getCountVideos() {
