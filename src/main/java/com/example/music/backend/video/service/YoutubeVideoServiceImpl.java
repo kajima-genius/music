@@ -1,6 +1,6 @@
 package com.example.music.backend.video.service;
 
-import com.example.music.backend.video.converter.VideoYoutubeVideoResponseMapper;
+import com.example.music.backend.video.converter.VideoMapper;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -51,7 +51,7 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
         List<YoutubeVideoResponse> results = new ArrayList<>();
 
         List<YoutubeVideoResponse> responses = searchResults.stream().map(
-                x -> getYoutubeVideo(x.getId().getVideoId()))
+                        x -> getYoutubeVideo(x.getId().getVideoId()))
                 .collect(Collectors.toList());
 
         Iterator<YoutubeVideoResponse> iterator = responses.iterator();
@@ -71,7 +71,7 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
 
         while (iterator.hasNext()) {
             Video singleVideo = iterator.next();
-            YoutubeVideoResponse addedVideo = VideoYoutubeVideoResponseMapper
+            YoutubeVideoResponse addedVideo = VideoMapper
                     .INSTANCE.toResponse(singleVideo);
             results.add(addedVideo);
         }
@@ -122,12 +122,13 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
     @Override
     public YoutubeVideoResponse getYoutubeVideo(String youtubeId) {
         try {
+            int firstElement = 0;
             Video video = youtube.videos()
                     .list("snippet,contentDetails,statistics")
                     .setId(youtubeId)
                     .execute()
-                    .getItems().get(0);
-            return VideoYoutubeVideoResponseMapper.INSTANCE.toResponse(video);
+                    .getItems().get(firstElement);
+            return VideoMapper.INSTANCE.toResponse(video);
         } catch (IOException e) {
             e.printStackTrace();
         }
