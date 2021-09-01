@@ -3,6 +3,7 @@ package com.example.music.backend.common.exception.handler;
 
 import com.example.music.backend.common.exception.NotFoundException;
 import com.example.music.backend.common.exception.wrapper.ExceptionWrapper;
+import com.example.music.backend.playlist.exception.PlaylistNotExistException;
 import com.example.music.backend.user.exception.UserAlreadyExistException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.ObjectError;
@@ -38,6 +39,12 @@ public class ExceptionsHandler {
     @ResponseStatus(NOT_FOUND)
     public ExceptionWrapper handleNoHandlerFoundException(NoHandlerFoundException exception) {
         return new ExceptionWrapper(NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(PlaylistNotExistException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ExceptionWrapper handlePlaylistNotExistException(PlaylistNotExistException exception) {
+        return new ExceptionWrapper(BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(HttpClientErrorException.MethodNotAllowed.class)
