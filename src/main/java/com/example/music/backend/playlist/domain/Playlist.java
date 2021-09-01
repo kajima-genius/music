@@ -27,8 +27,8 @@ public class Playlist {
     private User owner;
 
     @ElementCollection
-    @CollectionTable(name = "VIDEOS")
-    @Column(name = "YOUTUBE_ID")
+    @CollectionTable(name = "videos")
+    @Column(name = "youtubeId")
     private List<String> listYoutubeId = new ArrayList<>();
 
     public Long getCountVideos() {
