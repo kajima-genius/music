@@ -1,10 +1,10 @@
 package com.example.music.backend.playlist.service;
 
 import com.example.music.backend.common.exception.NotFoundException;
-import com.example.music.backend.playlist.converter.PlaylistDtoMapper;
-import com.example.music.backend.playlist.converter.PlaylistResponseMapper;
+import com.example.music.backend.playlist.converter.PlaylistMapper;
 import com.example.music.backend.playlist.domain.Playlist;
 import com.example.music.backend.playlist.dto.PlaylistDto;
+import com.example.music.backend.playlist.exception.PlaylistNotExistException;
 import com.example.music.backend.playlist.repository.PlaylistRepository;
 import com.example.music.backend.playlist.response.PlaylistResponse;
 import com.example.music.backend.user.domain.User;
@@ -25,20 +25,20 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public List<PlaylistResponse> getPlaylistsByUserId(Long userId) {
-        return PlaylistResponseMapper.INSTANCE
+        return PlaylistMapper.INSTANCE
                 .listEntityToResponse(playlistRepository.findByOwnerId(userId));
     }
 
     @Override
     public PlaylistResponse getPlaylistById(Long playlistId) {
-        return PlaylistResponseMapper.INSTANCE.toResponse(playlistRepository.findById(playlistId)
+        return PlaylistMapper.INSTANCE.toResponse(playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist with id: " + playlistId + " not found")));
     }
 
     @Override
     public PlaylistResponse create(PlaylistDto playlistDto, User user) {
-        Playlist saved = PlaylistDtoMapper.INSTANCE.toEntity(playlistDto, user);
-        return PlaylistResponseMapper.INSTANCE.toResponse(playlistRepository.save(saved));
+        Playlist saved = PlaylistMapper.INSTANCE.toEntity(playlistDto, user);
+        return PlaylistMapper.INSTANCE.toResponse(playlistRepository.save(saved));
     }
 
     @Override
@@ -50,6 +50,9 @@ public class PlaylistServiceImpl implements PlaylistService {
     public void addVideo(Long playlistId, String youtubeId) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist with id: " + playlistId + " not found"));
+        if (playlist.getListYoutubeId() == null) {
+            throw new PlaylistNotExistException("playlist does not exist");
+        }
         if (!playlist.getListYoutubeId().contains(youtubeId)) {
             playlist.getListYoutubeId().add(youtubeId);
             playlistRepository.save(playlist);
@@ -58,7 +61,9 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public void removeVideo(Long playlistId, String youtubeId) {
-        playlistRepository.findById(playlistId).get().getListYoutubeId().remove(youtubeId);
+        playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new NotFoundException("Playlist with id: " + playlistId + " not found"))
+                .getListYoutubeId().remove(youtubeId);
     }
 
     @Override

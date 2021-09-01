@@ -5,7 +5,6 @@ import com.example.music.backend.playlist.response.PlaylistResponse;
 import com.example.music.backend.playlist.service.PlaylistService;
 import com.example.music.backend.user.domain.User;
 import com.example.music.backend.user.service.UserService;
-import com.example.music.backend.video.dto.YoutubeVideoDto;
 import com.example.music.backend.video.response.YoutubeVideoResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -25,24 +25,32 @@ public class PlaylistController {
     private final PlaylistService playlistService;
     private final UserService userService;
 
-    @PutMapping(value = "/{playlistId}", produces = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{playlistId}/videos", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<YoutubeVideoResponse>> addVideoToPlaylist(
             @PathVariable("playlistId") Long playlistId,
-            @RequestBody YoutubeVideoDto dto) {
+            @RequestBody Map<String, String> map) {
 
-        playlistService.addVideo(playlistId, dto.getYoutubeId());
+        playlistService.addVideo(playlistId, map.get("youtubeId"));
+        List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
+        return ResponseEntity.ok(videos);
+    }
+
+    @DeleteMapping(value = "/{playlistId}/videos", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<YoutubeVideoResponse>> removeVideoFromPlaylist(
+            @PathVariable("playlistId") Long playlistId,
+            @RequestBody Map<String, String> map) {
+
+        playlistService.removeVideo(playlistId, map.get("youtubeId"));
         List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
         return ResponseEntity.ok(videos);
     }
 
     @DeleteMapping(value = "/{playlistId}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<YoutubeVideoResponse>> removeVideoFromPlaylist(
-            @PathVariable("playlistId") Long playlistId,
-            String youtubeId) {
+    public ResponseEntity<Void> removePlaylist(
+            @PathVariable("playlistId") Long playlistId) {
 
-        playlistService.removeVideo(playlistId, youtubeId);
-        List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
-        return ResponseEntity.ok(videos);
+        playlistService.delete(playlistId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)
