@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    password: ${PASSWORD}
+    username: ${USERNAME}
+    url: jdbc:h2:mem:music
+  jpa:
+    database-platform:  org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: true
+  resources:
+    static-locations: classpath:/static
+  h2:
+    console:
+      enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    protocol: smtps
+    username: simpleMail637@gmail.com
+    password: unusualPassword
+    properties:
+      transport:
+        protocol: smtps
+      smpts:
+        auth: true
+        starttls:
+          enable: true
+        timeout: 8000
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: Google
+            client-id: ${MUSIC_GOOGLE_CLIENT_ID}
+            client-secret: ${MUSIC_GOOGLE_CLIENT_SECRET}
+            scope: email,profile
