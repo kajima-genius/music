@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
@@ -20,7 +20,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException exception)
             throws IOException, ServletException {
 
-        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
+        response.setContentType(APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getOutputStream()
                 .println("message: Attempted unauthorized use!" + "\n"
