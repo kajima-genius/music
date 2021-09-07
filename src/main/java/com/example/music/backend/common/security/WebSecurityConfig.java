@@ -1,11 +1,15 @@
 package com.example.music.backend.common.security;
 
+import com.example.music.backend.common.security.handler.AuthEntryPointJwt;
 import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
+import com.example.music.backend.common.security.jwt.AuthTokenFilter;
 import com.example.music.backend.user.domain.Role;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,11 +17,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @PropertySource("classpath:constants.properties")
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     private static final String COOKIES = "JSESSIONID";
 
     @Value("${maximum.session.count}")
@@ -26,25 +33,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
 
-    public WebSecurityConfig(final UserDetailsService userDetailsService,
-                             final PasswordEncoder encoder) {
-        this.userDetailsService = userDetailsService;
-        this.encoder = encoder;
-    }
-
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
     }
 
     @Bean
-    RestAuthenticationEntryPoint authenticationEntryPoint() {
-        return new RestAuthenticationEntryPoint();
+    AuthEntryPointJwt authenticationEntryPoint() {
+        return new AuthEntryPointJwt();
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
     protected void configure(final AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(encoder);
+    }
+
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
     }
 
     @Override
@@ -53,26 +65,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
 
                 .and()
-                .httpBasic()
-                .authenticationEntryPoint(authenticationEntryPoint())
-
-                .and()
                 .cors()
-                .disable()
+                .and()
                 .csrf()
                 .disable()
                 .authorizeRequests()
 
-                .antMatchers("/").permitAll()
-                .antMatchers("/h2-console/**", "/login*", "/user/registration").permitAll()
+                .antMatchers("/h2-console/**", "/auth/**", "/oauth2/**", "/users/registration")
+                .permitAll()
 
-                .antMatchers("/admin/**")
-                .hasAnyAuthority(Role.ADMIN.name())
+                .antMatchers("/videos/**", "/playlists/**", "/users/**")
+                .hasAnyAuthority(Role.USER.name())
 
                 .and()
-                .formLogin().loginPage("/login")
-                .defaultSuccessUrl("/home").failureUrl("/login?error").permitAll()
-                .and().logout().logoutSuccessUrl("/").permitAll()
+                .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint())
 
                 .and()
                 .logout()
@@ -86,6 +93,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .maximumSessions(MAXIMUM_SESSIONS_COUNT);
 
         http.headers().frameOptions().disable();
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-
 }
