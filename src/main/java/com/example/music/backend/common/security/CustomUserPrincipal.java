@@ -24,6 +24,14 @@ public class CustomUserPrincipal implements UserDetails {
         return authorities;
     }
 
+    public Long getId() {
+        return user.getId();
+    }
+
+    public String getRole() {
+        return user.getRole().name();
+    }
+
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -51,6 +59,6 @@ public class CustomUserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isEnabled();
     }
 }
