@@ -28,25 +28,25 @@ public class PlaylistController {
     @PutMapping(value = "/{playlistId}/videos", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<YoutubeVideoResponse>> addVideoToPlaylist(
             @PathVariable("playlistId") Long playlistId,
-            @RequestBody Map<String, String> map) {
+            @RequestBody YoutubeVideoDto dto) {
 
-        playlistService.addVideo(playlistId, map.get("youtubeId"));
+        playlistService.addVideo(playlistId, dto.getYoutubeId());
         List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
         return ResponseEntity.ok(videos);
     }
 
-    @DeleteMapping(value = "/{playlistId}/videos", produces = APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{playlistId}/videos/{youtubeVideoId}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<YoutubeVideoResponse>> removeVideoFromPlaylist(
             @PathVariable("playlistId") Long playlistId,
-            @RequestBody Map<String, String> map) {
+            @PathVariable("youtubeVideoId") String youtubeVideoId) {
 
-        playlistService.removeVideo(playlistId, map.get("youtubeId"));
+        playlistService.removeVideo(playlistId, youtubeVideoId);
         List<YoutubeVideoResponse> videos = playlistService.getAllVideoInPlaylist(playlistId);
         return ResponseEntity.ok(videos);
     }
 
     @DeleteMapping(value = "/{playlistId}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> removePlaylist(
+    public ResponseEntity removePlaylist(
             @PathVariable("playlistId") Long playlistId) {
 
         playlistService.delete(playlistId);

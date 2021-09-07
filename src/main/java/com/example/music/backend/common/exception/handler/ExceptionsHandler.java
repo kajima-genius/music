@@ -4,6 +4,7 @@ package com.example.music.backend.common.exception.handler;
 import com.example.music.backend.common.exception.NotFoundException;
 import com.example.music.backend.common.exception.wrapper.ExceptionWrapper;
 import com.example.music.backend.playlist.exception.PlaylistNotExistException;
+import com.example.music.backend.playlist.exception.VideoAlreadyExistsInPlaylistException;
 import com.example.music.backend.user.exception.UserAlreadyExistException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.ObjectError;
@@ -44,6 +45,12 @@ public class ExceptionsHandler {
     @ExceptionHandler(PlaylistNotExistException.class)
     @ResponseStatus(BAD_REQUEST)
     public ExceptionWrapper handlePlaylistNotExistException(PlaylistNotExistException exception) {
+        return new ExceptionWrapper(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(VideoAlreadyExistsInPlaylistException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ExceptionWrapper handleVideoAlreadyExistsInPlaylistException(VideoAlreadyExistsInPlaylistException exception) {
         return new ExceptionWrapper(BAD_REQUEST, exception.getMessage());
     }
 

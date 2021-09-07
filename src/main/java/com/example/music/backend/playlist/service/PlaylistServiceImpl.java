@@ -5,6 +5,7 @@ import com.example.music.backend.playlist.converter.PlaylistMapper;
 import com.example.music.backend.playlist.domain.Playlist;
 import com.example.music.backend.playlist.dto.PlaylistDto;
 import com.example.music.backend.playlist.exception.PlaylistNotExistException;
+import com.example.music.backend.playlist.exception.VideoAlreadyExistsInPlaylistException;
 import com.example.music.backend.playlist.repository.PlaylistRepository;
 import com.example.music.backend.playlist.response.PlaylistResponse;
 import com.example.music.backend.user.domain.User;
@@ -56,6 +57,9 @@ public class PlaylistServiceImpl implements PlaylistService {
         if (!playlist.getListYoutubeId().contains(youtubeId)) {
             playlist.getListYoutubeId().add(youtubeId);
             playlistRepository.save(playlist);
+        }
+        else {
+            throw new VideoAlreadyExistsInPlaylistException("The video already exists in the playlist");
         }
     }
 
