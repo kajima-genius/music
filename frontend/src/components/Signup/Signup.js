@@ -18,7 +18,7 @@ class Signup extends Component {
         return (
             <div className="signup-container">
                 <div className="signup-content">
-                    {/*<h1 className="signup-title">Signup with SpringSocial</h1>*/}
+                    <h1 className="signup-title">Signup with SpringSocial</h1>
                     {/*<div className="or-separator">*/}
                     {/*    <span className="or-text">OR</span>*/}
                     {/*</div>*/}
@@ -91,8 +91,8 @@ class SignupForm extends Component {
                             <option value="none" disabled="disabled" selected="selected" hidden="hidden">Select an
                                 Gender
                             </option>
-                            <option value={this.state.gender = "MALE"} onChange={this.handleInputChange}>Male</option>
                             <option value={this.state.gender = "FEMALE"} onChange={this.handleInputChange}>Female</option>
+                            <option value={this.state.gender = "MALE"} onChange={this.handleInputChange}>Male</option>
                         </select>
                         <div className="select-dropdown"></div>
                     </div>

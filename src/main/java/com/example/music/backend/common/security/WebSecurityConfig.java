@@ -2,6 +2,7 @@ package com.example.music.backend.common.security;
 
 import com.example.music.backend.common.security.handler.AuthEntryPointJwt;
 import com.example.music.backend.common.security.handler.CustomAccessDeniedHandler;
+import com.example.music.backend.common.security.handler.CustomAuthenticationSuccessHandler;
 import com.example.music.backend.common.security.jwt.AuthTokenFilter;
 import com.example.music.backend.user.domain.Role;
 import com.example.music.backend.user.service.UserService;
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,6 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
+    private final UserService userService;
+    private final OAuth2AuthorizedClientService clientService;
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
@@ -104,11 +108,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .successHandler(customAuthenticationSuccessHandler)
 //                .failureHandler(customAuthenticationFailureHandler)
 
-
-//                .oauth2Login()
-//                .userInfoEndpoint()
-//                .and()
-//                .successHandler(new CustomAuthenticationSuccessHandler(userService))
+                .and()
+                .oauth2Login()
+                .userInfoEndpoint()
+                .and()
+                .successHandler(new CustomAuthenticationSuccessHandler(userService, clientService))
 
                 .and()
                 .logout()

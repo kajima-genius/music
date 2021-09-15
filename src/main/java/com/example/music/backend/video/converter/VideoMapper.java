@@ -6,18 +6,30 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "string")
+import java.util.List;
+
+@Mapper
 public interface VideoMapper {
 
     VideoMapper INSTANCE = Mappers.getMapper(VideoMapper.class);
 
-    @Mapping(target = "youtubeId", expression = "java(video.getId())")
-    @Mapping(target = "channelId", expression = "java(video.getSnippet().getChannelId())")
-    @Mapping(target = "title", expression = "java(video.getSnippet().getTitle())")
-    @Mapping(target = "imageUrl", expression = "java(video.getSnippet().getThumbnails().getMedium().getUrl())")
+    @Mapping(target = "youtubeId", source = "video.id")
+    @Mapping(target = "channelId", source = "video.snippet.channelId")
+    @Mapping(target = "title", source = "video.snippet.title")
+    @Mapping(target = "imageUrl", source = "video.snippet.thumbnails.medium.url")
     @Mapping(target = "viewCount", expression = "java(video.getStatistics().getViewCount().longValue())")
-    @Mapping(target = "channelTitle", expression = "java(video.getSnippet().getChannelTitle())")
-    @Mapping(target = "timestamp", expression = "java(video.getSnippet().getPublishedAt())")
-    @Mapping(target = "description", expression = "java(video.getSnippet().getDescription())")
+    @Mapping(target = "channelTitle", source = "video.snippet.channelTitle")
+    @Mapping(target = "timestamp", source = "video.snippet.publishedAt")
+    @Mapping(target = "description", source = "video.snippet.description")
     YoutubeVideoResponse toResponse(Video video);
+
+    @Mapping(target = "youtubeId", source = "video.id")
+    @Mapping(target = "channelId", source = "video.snippet.channelId")
+    @Mapping(target = "title", source = "video.snippet.title")
+    @Mapping(target = "imageUrl", source = "video.snippet.thumbnails.medium.url")
+    @Mapping(target = "viewCount", expression = "java(video.getStatistics().getViewCount().longValue())")
+    @Mapping(target = "channelTitle", source = "video.snippet.channelTitle")
+    @Mapping(target = "timestamp", source = "video.snippet.publishedAt")
+    @Mapping(target = "description", source = "video.snippet.description")
+    List<YoutubeVideoResponse> toListResponse(List<Video> videos);
 }

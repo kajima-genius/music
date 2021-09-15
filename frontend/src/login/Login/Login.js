@@ -55,7 +55,7 @@ export default class Login extends Component {
                 <div className="login-content">
                     <h1 className="login-title">Login to SpringSocial</h1>
                     <div className="social-login">
-                        <a className="btn btn-block social-btn google">
+                        <a className="btn btn-block social-btn google" href="http://localhost:8080/oauth2/authorization/google">
                             <img src={googleLogo} alt="Google"/> Log in with Google</a>
                     </div>
                     <div className="or-separator">

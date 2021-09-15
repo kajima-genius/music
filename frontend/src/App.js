@@ -10,6 +10,8 @@ import {AuthContext} from "./context/AuthContext";
 import Login from "./login/Login/Login";
 import PrivateRoute from "./login/common/PrivateRoute";
 import Signup from "./components/Signup/Signup";
+import StartPage from "./components/StartPage/StartPage";
+import {Switch} from "react-router";
 
 function App() {
 
@@ -24,13 +26,16 @@ function App() {
     return (
         <AuthContext.Provider
             value={{authTokens, setAuthTokens: setTokens}}>
-            <BrowserRouter>
-                <Route setAuthTokens={setAuthTokens} path="/login" component={Login} exact={true}/>
-                <Route path="/signup" component={Signup} />
-                <PrivateRoute path='/home' component={RecommendedVideosPage} />
-                <PrivateRoute path='/video/:videoId' component={VideoPlayerPage} />
-                <PrivateRoute path='/search/:searchQuery' component={SearchVideoPage} />
-            </BrowserRouter>
+            <Router>
+                <Switch>
+                    <Route path="/signup" component={Signup}/>
+                    <Route setAuthTokens={setAuthTokens} path="/login" component={Login}/>
+                    <PrivateRoute path='/home' component={RecommendedVideosPage}/>
+                    <PrivateRoute path='/video/:videoId' component={VideoPlayerPage}/>
+                    <PrivateRoute path='/search/:searchQuery' component={SearchVideoPage}/>
+                    <Route path="/" component={StartPage} />
+                </Switch>
+            </Router>
         </AuthContext.Provider>
     );
 }

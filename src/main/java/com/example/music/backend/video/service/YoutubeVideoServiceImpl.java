@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,34 +45,32 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
                 .setYouTubeRequestInitializer(new YouTubeRequestInitializer(YOUTUBE_API_KEY)).build();
     }
 
-    private List<YoutubeVideoResponse> fromYoutubeSearchFormatToResponse(List<SearchResult> searchResults) throws IOException {
-        List<YoutubeVideoResponse> results = new ArrayList<>();
-
-        List<YoutubeVideoResponse> responses = searchResults.stream().map(
-                x -> getYoutubeVideo(x.getId().getVideoId()))
+    private List<YoutubeVideoResponse> fromYoutubeFormatToResponse(List<Video> searchResults) {
+        long startTime = System.currentTimeMillis();
+        List<YoutubeVideoResponse> results = searchResults.stream()
+                .map(x -> VideoMapper.INSTANCE.toResponse(x))
                 .collect(Collectors.toList());
-
-        Iterator<YoutubeVideoResponse> iterator = responses.iterator();
-
-        while (iterator.hasNext()) {
-            String description = searchResults.iterator().next().getSnippet().getDescription();
-            YoutubeVideoResponse addedVideo = iterator.next();
-            addedVideo.setDescription(description);
-            results.add(addedVideo);
-        }
-
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime) + "ms");
         return results;
     }
 
-    private List<YoutubeVideoResponse> fromYoutubeFormatToResponse(Iterator<Video> iterator) {
-        List<YoutubeVideoResponse> results = new ArrayList<>();
+    private List<YoutubeVideoResponse> fromYoutubeSearchFormatToResponse(List<SearchResult> searchResults) throws IOException {
+        long startTime = System.currentTimeMillis();
+        String multiplyId = searchResults.stream().map(
+                        x -> x.getId().getVideoId())
+                .collect(Collectors.joining(","));
 
-        while (iterator.hasNext()) {
-            Video singleVideo = iterator.next();
-            YoutubeVideoResponse addedVideo = VideoMapper
-                    .INSTANCE.toResponse(singleVideo);
-            results.add(addedVideo);
-        }
+        List<YoutubeVideoResponse> intermediateList = getYoutubeVideos(multiplyId);
+
+        List<YoutubeVideoResponse> results = intermediateList.stream().map(
+                        x -> {
+                            x.setDescription(searchResults.get(intermediateList.indexOf(x)).getSnippet().getDescription());
+                            return x;
+                        })
+                .collect(Collectors.toList());
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime) + "ms");
         return results;
     }
 
@@ -109,7 +105,7 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
                     .setRegionCode("US")
                     .setMaxResults(maxResults)
                     .execute();
-            return fromYoutubeFormatToResponse(response.getItems().iterator());
+            return fromYoutubeFormatToResponse(response.getItems());
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
                     + e.getDetails().getMessage());
@@ -120,17 +116,112 @@ public class YoutubeVideoServiceImpl implements YoutubeVideoService {
     }
 
     @Override
+    public List<YoutubeVideoResponse> getYoutubeVideos(String multiplyId) {
+        try {
+            List<Video> videos = youtube.videos()
+                    .list("snippet,contentDetails,statistics")
+                    .setId(multiplyId)
+                    .execute()
+                    .getItems();
+            return VideoMapper.INSTANCE.toListResponse(videos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public YoutubeVideoResponse getYoutubeVideo(String youtubeId) {
         try {
+            int indexDesiredVideo = 0;
             Video video = youtube.videos()
                     .list("snippet,contentDetails,statistics")
                     .setId(youtubeId)
                     .execute()
-                    .getItems().get(0);
+                    .getItems().get(indexDesiredVideo);
             return VideoMapper.INSTANCE.toResponse(video);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
+
+//    private List<YoutubeVideoResponse> fromYoutubeSearchFormatToResponse(List<SearchResult> searchResults) throws IOException {
+//        long startTime = System.currentTimeMillis();
+//        List<YoutubeVideoResponse> results = new ArrayList<>();
+//
+//        List<YoutubeVideoResponse> responses = searchResults.stream().map(
+//                        x -> getYoutubeVideo(x.getId().getVideoId()))
+//                .collect(Collectors.toList());
+//
+//        Iterator<YoutubeVideoResponse> iterator = responses.iterator();
+//
+//        while (iterator.hasNext()) {
+//            String description = searchResults.iterator().next().getSnippet().getDescription();
+//            YoutubeVideoResponse addedVideo = iterator.next();
+//            addedVideo.setDescription(description);
+//            results.add(addedVideo);
+//        }
+//        long endTime = System.currentTimeMillis();
+//        System.out.println("Total execution time: " + (endTime-startTime) + "ms");
+//        return results;
+//    }
+//
+//    private List<YoutubeVideoResponse> fromYoutubeFormatToResponse(Iterator<Video> iterator) {
+//        long startTime = System.currentTimeMillis();
+//        List<YoutubeVideoResponse> results = new ArrayList<>();
+//
+//        while (iterator.hasNext()) {
+//            Video singleVideo = iterator.next();
+//            YoutubeVideoResponse addedVideo = VideoMapper
+//                    .INSTANCE.toResponse(singleVideo);
+//            results.add(addedVideo);
+//        }
+//        long endTime = System.currentTimeMillis();
+//        System.out.println("Total execution time: " + (endTime-startTime) + "ms");
+//        return results;
+//    }
+//
+//    @Override
+//    public List<YoutubeVideoResponse> searchYoutubeVideo(String queryTerm, Long maxResults) {
+//        try {
+//            YouTube.Search.List request = youtube.search().list("id,snippet");
+//
+//            SearchListResponse response = request
+//                    .setQ(queryTerm)
+//                    .setType("video")
+//                    .setMaxResults(maxResults)
+//                    .execute();
+//
+//            return fromYoutubeSearchFormatToResponse(response.getItems());
+//
+//        } catch (GoogleJsonResponseException e) {
+//            System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
+//                    + e.getDetails().getMessage());
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//    @Override
+//    public List<YoutubeVideoResponse> getYoutubeVideoTrends(Long maxResults) {
+//        try {
+//            YouTube.Videos.List request = youtube.videos()
+//                    .list("snippet,contentDetails,statistics");
+//            VideoListResponse response = request.setChart("mostPopular")
+//                    .setRegionCode("US")
+//                    .setMaxResults(maxResults)
+//                    .execute();
+//            return fromYoutubeFormatToResponse(response.getItems().iterator());
+//        } catch (GoogleJsonResponseException e) {
+//            System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
+//                    + e.getDetails().getMessage());
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//        }
+//        return null;
+//    }
+
 }
+

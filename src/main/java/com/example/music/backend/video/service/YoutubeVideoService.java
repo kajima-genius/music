@@ -11,4 +11,6 @@ public interface YoutubeVideoService {
     List<YoutubeVideoResponse> getYoutubeVideoTrends(Long maxResults);
 
     YoutubeVideoResponse getYoutubeVideo(String youtubeId);
+
+    List<YoutubeVideoResponse> getYoutubeVideos(String multiplyId);
 }
